@@ -11,12 +11,17 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('post_reactions', function (Blueprint $table) {
+        Schema::create('group_users', function (Blueprint $table) {
             $table->id();
 
-            $table->string('type');
+            $table->string('status', 20);
+            $table->string('role', 20);
+            $table->string('token', 1024)->nullable();
+            $table->timestamp('token_expiry_date')->nullable();
+            $table->timestamp('token_use_date')->nullable();
             $table->foreignId('user_id')->constrained('users');
-            $table->foreignId('post_id')->constrained('posts');
+            $table->foreignId('group_id')->constrained('groups');
+            $table->foreignId('created_by')->constrained('users');
             $table->timestamp('created_at')->nullable();
         });
     }
@@ -26,6 +31,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('post_reactions');
+        Schema::dropIfExists('group_users');
     }
 };
