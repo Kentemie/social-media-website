@@ -8,7 +8,7 @@ import TabItem from "@/Pages/Profile/Partials/TabItem.vue";
 import Edit from "@/Pages/Profile/Edit.vue";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
 
-import { computed, ref } from "vue";
+import { computed, ref, watch } from "vue";
 
 const authUser = usePage().props.auth.user;
 const props = defineProps({
@@ -30,10 +30,10 @@ const props = defineProps({
 });
 const coverImageSource = ref("");
 const avatarImageSource = ref("");
-const showNotification = ref(true);
+const showNotification = ref(false);
 const imagesForm = useForm({
-    cover: "",
-    avatar: "",
+    cover: null,
+    avatar: null,
 });
 
 
@@ -49,22 +49,10 @@ function onCoverChange(event) {
     }
 }
 
-function cancelCoverImageUpdate() {
+function resetCoverImageUpdate() {
     coverImageSource.value = "";
     imagesForm.cover = null;
 }
-
-function submitCoverImageUpdate() {
-    imagesForm.post(route("profile.updateImage"), {
-        onSuccess: () => {
-            cancelCoverImageUpdate();
-            setTimeout(() => {
-                showNotification.value = false;
-            }, 3000);
-        },
-    });
-}
-
 
 function onAvatarChange(event) {
     imagesForm.avatar = event.target.files[0];
@@ -78,21 +66,27 @@ function onAvatarChange(event) {
     }
 }
 
-function cancelAvatarImageUpdate() {
+function resetAvatarImageUpdate() {
     avatarImageSource.value = "";
-    imagesForm.avatar = "";
+    imagesForm.avatar = null;
 }
 
-function submitAvatarImageUpdate() {
+function submitImageUpdate(resetFunction) {
     imagesForm.post(route("profile.updateImage"), {
         onSuccess: () => {
-            cancelAvatarImageUpdate();
-            setTimeout(() => {
-                showNotification.value = false;
-            }, 3000);
+            resetFunction();
+            showNotification.value = true;
         },
     });
 }
+
+watch(showNotification, (newValue) => {
+    if (newValue) {
+        setTimeout(() => {
+            showNotification.value = false;
+        }, 3000);
+    }
+})
 
 const isMyProfile = computed(() => authUser && props.user.id === authUser.id);
 </script>
@@ -133,14 +127,14 @@ const isMyProfile = computed(() => authUser && props.user.id === authUser.id);
                     </button>
                     <div v-else class="flex gap-2">
                         <button
-                            @click="cancelCoverImageUpdate"
+                            @click="resetCoverImageUpdate"
                             class="bg-gray-50 hover:bg-gray-150 text-gray-800 py-1 px-2 text-xs flex items-center opacity-0 group-hover:opacity-100 transition-all"
                         >
                             <XMarkIcon class="w-3 h-3 mr-1" />
                             Cancel
                         </button>
                         <button
-                            @click="submitCoverImageUpdate"
+                            @click="submitImageUpdate(resetCoverImageUpdate)"
                             class="bg-gray-800 hover:bg-gray-900 text-gray-100 py-1 px-2 text-xs flex items-center opacity-0 group-hover:opacity-100 transition-all"
                         >
                             <CheckCircleIcon class="w-3 h-3 mr-1" />
@@ -168,13 +162,13 @@ const isMyProfile = computed(() => authUser && props.user.id === authUser.id);
                         </button>
                         <div v-else class="absolute top-1 right-0 flex flex-col gap-2">
                             <button
-                                @click="cancelAvatarImageUpdate"
+                                @click="resetAvatarImageUpdate"
                                 class="w-7 h-7 flex items-center justify-center bg-red-500/80 text-white rounded-full"
                             >
                                 <XMarkIcon class="w-5 h-5" />
                             </button>
                             <button
-                                @click="submitAvatarImageUpdate"
+                                @click="submitImageUpdate(resetAvatarImageUpdate)"
                                 class="w-7 h-7 flex items-center justify-center bg-emerald-500/80 text-white rounded-full"
                             >
                                 <CheckCircleIcon class="w-5 h-5" />
