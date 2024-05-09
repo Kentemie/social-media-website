@@ -6,8 +6,14 @@ const model = defineModel({
     required: true,
 });
 
-defineProps({
-    placeholder: String
+const props = defineProps({
+    placeholder: {
+        type: String,
+    },
+    autoResize: {
+        type: Boolean,
+        default: true,
+    },
 })
 
 const input = ref(null);
@@ -16,21 +22,25 @@ onMounted(() => {
     if (input.value.hasAttribute('autofocus')) {
         input.value.focus();
     }
+    adjustHeight();
 });
 
 defineExpose({ focus: () => input.value.focus() });
 
 function onInputChange() {
     input.value.style.height = 'auto';
+    adjustHeight();
+}
 
-    const currentHeight = input.value.scrollHeight;
+function adjustHeight() {
+    if (props.autoResize) {
+        const currentHeight = input.value.scrollHeight;
 
-    const maxHeight = 300; // Примерное значение
+        const maxHeight = 300;
 
-    if (currentHeight <= maxHeight) {
-        input.value.style.height = currentHeight + 'px';
-    } else {
-        input.value.style.height = maxHeight + 'px';
+        if (currentHeight > maxHeight) {
+            input.value.style.height = maxHeight + 'px';
+        }
     }
 }
 </script>

@@ -20,6 +20,7 @@ Route::middleware('auth')
         Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
         Route::post('/post', [PostController::class, 'store'])->name('post.store');
+        Route::put('/post/{post:id}', [PostController::class, 'update'])->name('post.update');
     }
 );
 
