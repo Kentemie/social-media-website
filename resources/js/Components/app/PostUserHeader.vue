@@ -1,4 +1,5 @@
 <script setup>
+
 defineProps({
     post: {
         type: Object,
@@ -8,6 +9,7 @@ defineProps({
         default: true,
     }
 });
+
 </script>
 
 <template>

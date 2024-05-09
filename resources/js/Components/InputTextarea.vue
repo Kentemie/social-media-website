@@ -1,11 +1,12 @@
 <script setup>
+
 import { onMounted, ref } from 'vue';
+
 
 const model = defineModel({
     type: String,
-    required: true,
+    required: false,
 });
-
 const props = defineProps({
     placeholder: {
         type: String,
@@ -15,8 +16,11 @@ const props = defineProps({
         default: true,
     },
 })
+defineExpose({ focus: () => input.value.focus() });
+
 
 const input = ref(null);
+
 
 onMounted(() => {
     if (input.value.hasAttribute('autofocus')) {
@@ -25,7 +29,6 @@ onMounted(() => {
     adjustHeight();
 });
 
-defineExpose({ focus: () => input.value.focus() });
 
 function onInputChange() {
     input.value.style.height = 'auto';
@@ -43,6 +46,7 @@ function adjustHeight() {
         }
     }
 }
+
 </script>
 
 <template>

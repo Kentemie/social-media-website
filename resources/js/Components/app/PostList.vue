@@ -1,8 +1,10 @@
 <script setup>
+
 import { ref } from "vue";
 
 import PostItem from "@/Components/app/PostItem.vue";
 import PostModal from "@/Components/app/PostModal.vue";
+
 
 defineProps({
     posts: {

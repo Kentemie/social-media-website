@@ -11,9 +11,9 @@ import {
 import { XMarkIcon } from '@heroicons/vue/20/solid';
 import { useForm } from "@inertiajs/vue3";
 
-import InputTextarea from "@/Components/InputTextarea.vue";
 import PostUserHeader from "@/Components/app/PostUserHeader.vue";
 import ClassicEditor from "@ckeditor/ckeditor5-build-classic";
+
 
 const editor = ClassicEditor;
 const editorConfig = {
@@ -32,6 +32,7 @@ const editorConfig = {
     ]
 };
 
+
 const props = defineProps({
     post: {
         type: Object,
@@ -45,6 +46,8 @@ const props = defineProps({
 const emit = defineEmits(
     ['update:modelValue']
 );
+
+
 const show = computed({
     get() {
         return props.modelValue;
@@ -53,10 +56,13 @@ const show = computed({
         emit('update:modelValue', value);
     }
 });
+
+
 const form = useForm({
     id: 0,
     body: '',
 });
+
 
 watch(() => props.post, () => {
     form.id = props.post.id;
@@ -70,13 +76,24 @@ function closeModal() {
     show.value = false;
 }
 
-function submitPostUpdate() {
-    form.put(route('post.update', props.post.id), {
-        preserveScroll: true,
-        onSuccess() {
-            closeModal();
-        }
-    });
+function submitPost() {
+    if (form.id) {
+        form.put(route('post.update', props.post.id), {
+            preserveScroll: true,
+            onSuccess() {
+                closeModal();
+                form.reset();
+            }
+        });
+    } else {
+        form.post(route('post.store'), {
+            preserveScroll: true,
+            onSuccess() {
+                closeModal();
+                form.reset();
+            }
+        });
+    }
 }
 
 </script>
@@ -116,7 +133,7 @@ function submitPostUpdate() {
                                     as="h3"
                                     class="flex items-center justify-between py-3 px-4 font-medium bg-gray-100 text-gray-900"
                                 >
-                                    Update post
+                                    {{ form.id ? "Update selected post" : "Create a new post" }}
                                     <button
                                         @click="closeModal"
                                         class="w-8 h-8 rounded-full hover:bg-black/10 transition flex items-center justify-center">
@@ -126,14 +143,13 @@ function submitPostUpdate() {
                                 <div class="p-4">
                                     <PostUserHeader :post="post" :show-time="false" class="mb-4" />
                                     <ckeditor :editor="editor" v-model="form.body" :config="editorConfig"></ckeditor>
-<!--                                    <InputTextarea v-model="form.body" class="mb-3 w-full" />-->
                                 </div>
 
                                 <div class="py-3 px-4">
                                     <button
                                         type="button"
                                         class="rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 w-full"
-                                        @click="submitPostUpdate"
+                                        @click="submitPost"
                                     >
                                         Submit
                                     </button>

@@ -1,10 +1,13 @@
 <script setup>
+
 import { Head } from '@inertiajs/vue3';
+
 import GroupList from "@/Components/app/GroupList.vue";
 import FollowerList from "@/Components/app/FollowerList.vue";
 import CreatePost from "@/Components/app/CreatePost.vue";
 import PostList from "@/Components/app/PostList.vue";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
+
 
 defineProps({
     posts: {
