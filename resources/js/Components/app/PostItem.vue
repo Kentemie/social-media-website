@@ -2,6 +2,8 @@
 import { Disclosure, DisclosureButton, DisclosurePanel } from "@headlessui/vue";
 import { Menu, MenuButton, MenuItems, MenuItem } from '@headlessui/vue';
 import { PencilIcon, TrashIcon, EllipsisVerticalIcon } from '@heroicons/vue/20/solid';
+import { router } from "@inertiajs/vue3";
+
 import PostUserHeader from "@/Components/app/PostUserHeader.vue";
 
 const props = defineProps({
@@ -19,6 +21,15 @@ function isImage(attachment) {
 function openEditModal() {
     emit('editClick', props.post);
 }
+
+function deletePost() {
+    if (window.confirm("Are you sure you want to delete this post?")) {
+        router.delete(route('post.destroy', props.post.id), {
+            preserveScroll: true,
+        });
+    }
+}
+
 </script>
 
 <template>
@@ -66,6 +77,7 @@ function openEditModal() {
                             </MenuItem>
                             <MenuItem v-slot="{ active }">
                                 <button
+                                    @click="deletePost"
                                     :class="[
                                         active ? 'bg-indigo-600 text-white' : 'text-gray-900',
                                         'group flex w-full items-center rounded-md px-2 py-2 text-sm',

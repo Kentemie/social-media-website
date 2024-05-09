@@ -14,13 +14,16 @@ Route::get('user/{user:username}', [ProfileController::class, 'index'])
 
 Route::middleware('auth')
     ->group(function () {
-        Route::post('/profile/update-images', [ProfileController::class, 'updateImage'])
-            ->name('profile.updateImage');
+        # Profile routes
+        Route::post('/profile/update-images', [ProfileController::class, 'updateImage'])->name('profile.updateImage');
         Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
         Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
+
+        # Post routes
         Route::post('/post', [PostController::class, 'store'])->name('post.store');
         Route::put('/post/{post:id}', [PostController::class, 'update'])->name('post.update');
+        Route::delete('/post/{post:id}', [PostController::class, 'destroy'])->name('post.destroy');
     }
 );
 

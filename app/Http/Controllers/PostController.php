@@ -6,7 +6,12 @@ use App\Http\Requests\StorePostRequest;
 use App\Http\Requests\UpdatePostRequest;
 use App\Models\Post;
 
+use Illuminate\Contracts\Routing\ResponseFactory;
+use Illuminate\Foundation\Application;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Contracts\Foundation\Application as ContractApplication;
 
 class PostController extends Controller
 {
@@ -33,8 +38,15 @@ class PostController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Post $post)
+    public function destroy(Post $post): Application|Response|RedirectResponse|ContractApplication|ResponseFactory
     {
-        //
+        $id = Auth::id();
+
+        if ($post->user_id !== $id) {
+            return response("You are not allowed to delete this post", 403);
+        }
+
+        $post->delete();
+        return back();
     }
 }
