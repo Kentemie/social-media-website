@@ -22,8 +22,8 @@ Route::middleware('auth')
 
         # Post routes
         Route::post('/post', [PostController::class, 'store'])->name('post.store');
-        Route::put('/post/{post:id}', [PostController::class, 'update'])->name('post.update');
-        Route::delete('/post/{post:id}', [PostController::class, 'destroy'])->name('post.destroy');
+        Route::put('/post/{post}', [PostController::class, 'update'])->name('post.update');
+        Route::delete('/post/{post}', [PostController::class, 'destroy'])->name('post.destroy');
     }
 );
 

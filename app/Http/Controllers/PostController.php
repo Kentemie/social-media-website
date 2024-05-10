@@ -29,6 +29,7 @@ class PostController extends Controller
 
         /** @var UploadedFile[] $files */
         $files = $data['attachments'] ?? [];
+
         $allFilesPaths = [];
 
         DB::beginTransaction();
@@ -47,14 +48,15 @@ class PostController extends Controller
                     'created_by' => $user->id,
                 ]);
             }
+
             DB::commit();
         } catch(\Exception $e) {
             foreach ($allFilesPaths as $path) {
                 Storage::disk('public')->delete($path);
             }
+
             DB::rollBack();
         }
-
 
         return back();
     }
@@ -64,7 +66,49 @@ class PostController extends Controller
      */
     public function update(UpdatePostRequest $request, Post $post): RedirectResponse
     {
-        $post->update($request->validated());
+        $data = $request->validated();
+        $user = $request->user();
+
+        /** @var UploadedFile[] $files */
+        $files = $data['attachments'] ?? [];
+        $deleted_ids = $data['deleted_attachment_ids'] ?? [];
+
+        $allFilesPaths = [];
+
+        DB::beginTransaction();
+        try {
+            $post->update($data);
+            $post_attachments = PostAttachment::query()
+                ->where('post_id', $post->id)
+                ->whereIn('id', $deleted_ids)
+                ->get();
+
+            foreach ($post_attachments as $attachment) {
+                $attachment->delete();
+            }
+
+            foreach ($files as $file) {
+                $path = $file->store('attachments/' . $post->id, 'public');
+                $allFilesPaths[] = $path;
+                PostAttachment::create([
+                    'post_id' => $post->id,
+                    'name' => $file->getClientOriginalName(),
+                    'path' => $path,
+                    'mime' => $file->getMimeType(),
+                    'size' => $file->getSize(),
+                    'created_by' => $user->id,
+                ]);
+            }
+
+            DB::commit();
+        } catch(\Exception $e) {
+            foreach ($allFilesPaths as $path) {
+                Storage::disk('public')->delete($path);
+            }
+
+            DB::rollBack();
+        }
+
         return back();
     }
 
