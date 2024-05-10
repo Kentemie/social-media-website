@@ -7,6 +7,7 @@ use App\Http\Requests\UpdatePostRequest;
 use App\Models\Post;
 
 use App\Models\PostAttachment;
+use App\Models\User;
 use Illuminate\Contracts\Routing\ResponseFactory;
 use Illuminate\Foundation\Application;
 use Illuminate\Http\RedirectResponse;
@@ -16,6 +17,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Contracts\Foundation\Application as ContractApplication;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 class PostController extends Controller
 {
@@ -36,18 +38,7 @@ class PostController extends Controller
         try {
             $post = Post::create($data);
 
-            foreach ($files as $file) {
-                $path = $file->store('attachments/' . $post->id, 'public');
-                $allFilesPaths[] = $path;
-                PostAttachment::create([
-                    'post_id' => $post->id,
-                    'name' => $file->getClientOriginalName(),
-                    'path' => $path,
-                    'mime' => $file->getMimeType(),
-                    'size' => $file->getSize(),
-                    'created_by' => $user->id,
-                ]);
-            }
+            $allFilesPaths = $this->storeAttachments($files, $post, $user);
 
             DB::commit();
         } catch(\Exception $e) {
@@ -87,18 +78,7 @@ class PostController extends Controller
                 $attachment->delete();
             }
 
-            foreach ($files as $file) {
-                $path = $file->store('attachments/' . $post->id, 'public');
-                $allFilesPaths[] = $path;
-                PostAttachment::create([
-                    'post_id' => $post->id,
-                    'name' => $file->getClientOriginalName(),
-                    'path' => $path,
-                    'mime' => $file->getMimeType(),
-                    'size' => $file->getSize(),
-                    'created_by' => $user->id,
-                ]);
-            }
+            $allFilesPaths = $this->storeAttachments($files, $post, $user);
 
             DB::commit();
         } catch(\Exception $e) {
@@ -125,5 +105,39 @@ class PostController extends Controller
 
         $post->delete();
         return back();
+    }
+
+    /**
+     * Download the attachment to the specified post.
+     */
+    public function downloadAttachment(PostAttachment $post_attachment): BinaryFileResponse
+    {
+        return response()->download(
+            Storage::disk('public')->path($post_attachment->path),
+            $post_attachment->name
+        );
+    }
+
+    /**
+     * Add the specified attachments to the storage.
+     */
+    private function storeAttachments(array $files, Post $post, User $user): array
+    {
+        $allFilesPaths = [];
+
+        foreach ($files as $file) {
+            $path = $file->store('attachments/' . $post->id, 'public');
+            $allFilesPaths[] = $path;
+            PostAttachment::create([
+                'post_id' => $post->id,
+                'name' => $file->getClientOriginalName(),
+                'path' => $path,
+                'mime' => $file->getMimeType(),
+                'size' => $file->getSize(),
+                'created_by' => $user->id,
+            ]);
+        }
+
+        return $allFilesPaths;
     }
 }
