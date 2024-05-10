@@ -14,7 +14,7 @@ import {
     BookmarkIcon,
     ArrowUturnLeftIcon,
 } from '@heroicons/vue/24/solid';
-import { useForm } from "@inertiajs/vue3";
+import { useForm, usePage } from "@inertiajs/vue3";
 import { readFile, isImage } from "@/helpers.js";
 
 import PostUserHeader from "@/Components/app/PostUserHeader.vue";
@@ -27,6 +27,9 @@ const editorConfig = {
         'bold', 'italic', '|', 'bulletedList', 'numberedList', '|', 'heading', '|', 'outdent', 'indent', '|', 'link', '|', 'blockQuote'
     ]
 };
+
+
+const attachmentExtensions = usePage().props.attachmentExtensions;
 
 
 const props = defineProps({
@@ -44,6 +47,8 @@ const emit = defineEmits(
 );
 
 const attachmentFiles = ref([]);
+const attachmentErrors = ref([]);
+const showExtensionsText = ref(false);
 
 const show = computed({
     get() {
@@ -75,13 +80,24 @@ const form = useForm({
 function closeModal() {
     show.value = false;
     emit('hide');
+    resetModal();
+}
+
+function resetModal() {
     form.reset();
+    showExtensionsText.value = false;
     attachmentFiles.value = [];
+    attachmentErrors.value = [];
     props.post.attachments.forEach(attachment => attachment.deleted = false);
 }
 
 async function onAttachmentChoose(event) {
+    showExtensionsText.value = false;
     for (const file of event.target.files) {
+        const ext = file.name.split('.').pop().toLowerCase()
+        if (!attachmentExtensions.includes(ext)) {
+            showExtensionsText.value = true;
+        }
         const myFile = {
             file,
             url: await readFile(file),
@@ -105,6 +121,15 @@ function undoFileRemoval(myFile) {
     form.deleted_attachment_ids = form.deleted_attachment_ids.filter(id => myFile.id !== id);
 }
 
+function proccessErrors(errors) {
+    for (const key in errors) {
+        if (key.includes('.')) {
+            const [, index] = key.split('.');
+            attachmentErrors.value[index] = errors[key];
+        }
+    }
+}
+
 function submitPost() {
     form.attachments = attachmentFiles.value.map(myFile => myFile.file);
     if (props.post.id) {
@@ -115,7 +140,7 @@ function submitPost() {
                 closeModal();
             },
             onError(errors) {
-                console.log(errors);
+                proccessErrors(errors)
             }
         });
     } else {
@@ -123,6 +148,9 @@ function submitPost() {
             preserveScroll: true,
             onSuccess() {
                 closeModal();
+            },
+            onError(errors) {
+                proccessErrors(errors)
             }
         });
     }
@@ -175,12 +203,23 @@ function submitPost() {
                                 <div class="p-4">
                                     <PostUserHeader :post="post" :show-time="false" class="mb-4" />
                                     <ckeditor :editor="editor" v-model="form.body" :config="editorConfig"></ckeditor>
+                                    <div
+                                        v-if="showExtensionsText"
+                                        class="border-l-4 border-amber-500 py-2 px-3 mt-3 bg-amber-100 text-gray-800"
+                                    >
+                                        Files must have one of the following extensions: <br>
+                                        <small>
+                                            {{ attachmentExtensions.join(', ') }}
+                                        </small>
+                                    </div>
                                     <div v-if="attachments.length !== 0" class="grid gap-3 my-3" :class="[
                                         attachments.length === 1 ? 'grid-cols-1' : 'grid-cols-2 lg:grid-cols-3'
                                     ]">
-                                        <div v-for="myFile in attachments">
-                                            <pre></pre>
-                                            <div class="group aspect-square bg-blue-100 flex flex-col items-center justify-center text-gray-500 relative border-2">
+                                        <div v-for="(myFile, idx) in attachments">
+                                            <div
+                                                class="group aspect-square bg-blue-100 flex flex-col items-center justify-center text-gray-500 relative border-2"
+                                                :class="attachmentErrors[idx] ? 'border-red-500' : ''"
+                                            >
                                                 <div
                                                     v-if="myFile.deleted"
                                                     class="absolute z-10 left-0 right-0 bottom-0 py-2 px-3 text-sm bg-red-900 text-white flex justify-between items-center"
@@ -216,6 +255,9 @@ function submitPost() {
                                                     </small>
                                                 </div>
                                             </div>
+                                            <small class="text-red-500">
+                                                {{ attachmentErrors[idx] }}
+                                            </small>
                                         </div>
                                     </div>
                                 </div>
