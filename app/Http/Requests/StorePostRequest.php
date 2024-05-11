@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use GuzzleHttp\Psr7\UploadedFile;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rules\File;
 
@@ -32,10 +33,20 @@ class StorePostRequest extends FormRequest
         return [
             'user_id' => ['numeric'],
             'body' => ['nullable', 'string'],
-            'attachments' => ['array', 'max:50'],
+            'attachments' => [
+                'array',
+                'max:50',
+                function ($attribute, $value, $fail) {
+                    $totalSize = collect($value)->sum(fn (UploadedFile $file) => $file->getSize());
+
+                    if ($totalSize > 1_073_741_824) {
+                        $fail('The total size of all files must not exceed 1GB.');
+                    }
+                }
+            ],
             'attachments.*' => [
                 'file',
-                File::types(self::$extensions)->max(500 * 1024 * 1024)
+                File::types(self::$extensions),
             ],
         ];
     }
@@ -51,7 +62,8 @@ class StorePostRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'attachments.*' => 'Invalid file extension',
+            'attachments.*.file' => 'Each attachment must be a file.',
+            'attachments.*.mimes' => 'Invalid file type for attachments.',
         ];
     }
 }
