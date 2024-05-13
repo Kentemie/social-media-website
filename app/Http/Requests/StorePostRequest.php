@@ -2,14 +2,14 @@
 
 namespace App\Http\Requests;
 
-use GuzzleHttp\Psr7\UploadedFile;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rules\File;
 
 class StorePostRequest extends FormRequest
 {
     public static array $extensions = [
-        'gif', 'webp',
+        'jpg', 'jpeg', 'png', 'gif', 'webp',
         'mp3', 'mp4', 'wav',
         'doc', 'docx', 'pdf', 'csv', 'xls', 'xlsx',
         'zip', 'rar',
