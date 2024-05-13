@@ -2,12 +2,15 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Enums\PostReactionEnum;
 use App\Http\Requests\StorePostRequest;
 use App\Http\Requests\UpdatePostRequest;
 use App\Models\Post;
 
 use App\Models\PostAttachment;
+use App\Models\PostReaction;
 use App\Models\User;
+use Illuminate\Http\Request;
 use Illuminate\Contracts\Routing\ResponseFactory;
 use Illuminate\Foundation\Application;
 use Illuminate\Http\RedirectResponse;
@@ -17,6 +20,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Contracts\Foundation\Application as ContractApplication;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Validation\Rule;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 class PostController extends Controller
@@ -116,6 +120,37 @@ class PostController extends Controller
             Storage::disk('public')->path($post_attachment->path),
             $post_attachment->name
         );
+    }
+
+    /**
+     * Add a reaction to a specific post.
+     */
+    public function postReaction(Request $request, Post $post)
+    {
+        $userId = Auth::id();
+        $data = $request->validate([
+           'reaction' => [Rule::enum(PostReactionEnum::class)],
+        ]);
+
+        $reaction = PostReaction::where('user_id', $userId)->where('post_id', $post->id)->first();
+        $hasReaction = $reaction !== null;
+
+        if ($reaction) {
+            $reaction->delete();
+        } else {
+            PostReaction::create([
+                'type' => $data['reaction'],
+                'user_id' => $userId,
+                'post_id' => $post->id,
+            ]);
+        }
+
+        $reactions_count = PostReaction::where('post_id', $post->id)->count();
+
+        return response([
+            'number_of_reactions' => $reactions_count,
+            'current_user_has_reaction' => $hasReaction
+        ], 201);
     }
 
     /**

@@ -7,6 +7,7 @@ import { router } from "@inertiajs/vue3";
 import { isImage } from '@/helpers.js';
 
 import PostUserHeader from "@/Components/app/PostUserHeader.vue";
+import axiosClient from "@/axiosClient.js";
 
 const props = defineProps({
     post: Object,
@@ -30,6 +31,16 @@ function deletePost() {
             preserveScroll: true,
         });
     }
+}
+
+function sendReaction() {
+    axiosClient.post(route('post.reaction', props.post), {
+        reaction: 'like',
+    })
+        .then(({ data }) => {
+            props.post.current_user_has_reaction = data.current_user_has_reaction;
+            props.post.number_of_reactions = data.number_of_reactions;
+        });
 }
 
 </script>
@@ -149,12 +160,21 @@ function deletePost() {
             </div>
         </div>
         <div class="flex gap-2">
-            <button class="text-gray-800 flex flex-1 gap-1 items-center justify-center rounded-lg py-2 px-4 bg-gray-100 hover:bg-gray-200">
+            <button
+                @click="sendReaction"
+                class="text-gray-800 flex flex-1 gap-1 items-center justify-center rounded-lg py-2 px-4"
+                :class="[
+                    post.current_user_has_reaction ? 'bg-gray-100 hover:bg-gray-200' : 'bg-sky-100 hover:bg-sky-200'
+                ]"
+            >
                 <HandThumbUpIcon class="w-6 h-6" />
+                <span class="mr-1">
+                    {{ post.number_of_reactions }}
+                </span>
                 Like
             </button>
             <button class="text-gray-800 flex flex-1 gap-1 items-center justify-center rounded-lg py-2 px-4 bg-gray-100 hover:bg-gray-200">
-                <ChatBubbleLeftRightIcon class="w-6 h-6" />
+                <ChatBubbleLeftRightIcon class="w-6 h-6 mr-1" />
                 Comment
             </button>
         </div>
