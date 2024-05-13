@@ -1,6 +1,6 @@
 <script setup>
 
-import { onMounted, ref } from 'vue';
+import { onMounted, ref, watch } from 'vue';
 
 
 const model = defineModel({
@@ -21,6 +21,11 @@ defineExpose({ focus: () => input.value.focus() });
 
 const input = ref(null);
 
+watch(() => model.value, () => {
+    setTimeout(() => {
+        adjustHeight();
+    }, 10)
+})
 
 onMounted(() => {
     if (input.value.hasAttribute('autofocus')) {
@@ -30,20 +35,10 @@ onMounted(() => {
 });
 
 
-function onInputChange() {
-    input.value.style.height = 'auto';
-    adjustHeight();
-}
-
 function adjustHeight() {
     if (props.autoResize) {
-        const currentHeight = input.value.scrollHeight;
-
-        const maxHeight = 300;
-
-        if (currentHeight > maxHeight) {
-            input.value.style.height = maxHeight + 'px';
-        }
+        input.value.style.height = 'auto';
+        input.value.style.height = (input.value.scrollHeight + 2) + 'px';
     }
 }
 
@@ -55,6 +50,5 @@ function adjustHeight() {
         v-model="model"
         ref="input"
         :placeholder="placeholder"
-        @input="onInputChange"
     ></textarea>
 </template>

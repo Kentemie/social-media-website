@@ -5,9 +5,11 @@ namespace App\Http\Controllers;
 use App\Http\Enums\PostReactionEnum;
 use App\Http\Requests\StorePostRequest;
 use App\Http\Requests\UpdatePostRequest;
+use App\Http\Resources\PostCommentResource;
 use App\Models\Post;
 
 use App\Models\PostAttachment;
+use App\Models\PostComment;
 use App\Models\PostReaction;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -125,7 +127,7 @@ class PostController extends Controller
     /**
      * Add a reaction to a specific post.
      */
-    public function postReaction(Request $request, Post $post)
+    public function postReaction(Request $request, Post $post): Application|Response|ContractApplication|ResponseFactory
     {
         $userId = Auth::id();
         $data = $request->validate([
@@ -133,7 +135,7 @@ class PostController extends Controller
         ]);
 
         $reaction = PostReaction::where('user_id', $userId)->where('post_id', $post->id)->first();
-        $hasReaction = $reaction !== null;
+        $hasReaction = $reaction === null;
 
         if ($reaction) {
             $reaction->delete();
@@ -151,6 +153,24 @@ class PostController extends Controller
             'number_of_reactions' => $reactions_count,
             'current_user_has_reaction' => $hasReaction
         ], 201);
+    }
+
+    /**
+     * Create a new comment to a specific post.
+     */
+    public function postComment(Request $request, Post $post): Application|Response|ContractApplication|ResponseFactory
+    {
+        $data = $request->validate([
+            'comment' => 'required'
+        ]);
+
+        $comment = PostComment::create([
+            'comment' => nl2br($data['comment']),
+            'user_id' => Auth::id(),
+            'post_id' => $post->id,
+        ]);
+
+        return response(new PostCommentResource($comment), 201);
     }
 
     /**
