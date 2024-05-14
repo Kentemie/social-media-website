@@ -21,7 +21,7 @@ defineProps({
                 <div v-html="content" :class="contentClass" class="ck-content-output" />
             </DisclosurePanel>
             <div class="flex justify-end">
-                <DisclosureButton class="text-blue-500 hover:underline">
+                <DisclosureButton class="text-blue-500 hover:underline mr-4">
                     {{ open ? "Read less" : "Read more" }}
                 </DisclosureButton>
             </div>

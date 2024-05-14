@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Enums\PostReactionEnum;
 use App\Http\Requests\StorePostRequest;
+use App\Http\Requests\UpdatePostCommentRequest;
 use App\Http\Requests\UpdatePostRequest;
 use App\Http\Resources\PostCommentResource;
 use App\Models\Post;
@@ -158,7 +159,7 @@ class PostController extends Controller
     /**
      * Create a new comment to a specific post.
      */
-    public function postComment(Request $request, Post $post): Application|Response|ContractApplication|ResponseFactory
+    public function createComment(Request $request, Post $post): Application|Response|ContractApplication|ResponseFactory
     {
         $data = $request->validate([
             'comment' => 'required'
@@ -168,6 +169,33 @@ class PostController extends Controller
             'comment' => nl2br($data['comment']),
             'user_id' => Auth::id(),
             'post_id' => $post->id,
+        ]);
+
+        return response(new PostCommentResource($comment), 201);
+    }
+
+    /**
+     * Delete a comment from a specific post.
+     */
+    public function deleteComment(PostComment $comment): Application|Response|ContractApplication|ResponseFactory
+    {
+        if ($comment->user->id !== Auth::id()) {
+            return response("You are not allowed to delete this comment", 403);
+        }
+
+        $comment->delete();
+        return response(null, 204);
+    }
+
+
+    /**
+     * Update a comment on a specific post.
+     */
+    public function updateComment(UpdatePostCommentRequest $request, PostComment $comment): Application|Response|ContractApplication|ResponseFactory
+    {
+        $data = $request->validated();
+        $comment->update([
+            'comment' => nl2br($data['comment']),
         ]);
 
         return response(new PostCommentResource($comment), 201);
