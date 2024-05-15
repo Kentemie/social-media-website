@@ -30,6 +30,7 @@ Route::middleware('auth')
         Route::post('/post/{post}/comment', [PostController::class, 'createComment'])->name('post.comment.create');
         Route::delete('/post/comment/{comment}', [PostController::class, 'deleteComment'])->name('post.comment.delete');
         Route::put('/post/comment/{comment}', [PostController::class, 'updateComment'])->name('post.comment.update');
+        Route::post('/post/comment/{comment}/reaction', [PostController::class, 'commentReaction'])->name('post.comment.reaction');
     }
 );
 

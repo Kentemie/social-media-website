@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Enums\PostReactionEnum;
+use App\Http\Enums\ReactionEnum;
 use App\Http\Requests\StorePostRequest;
 use App\Http\Requests\UpdatePostCommentRequest;
 use App\Http\Requests\UpdatePostRequest;
@@ -11,7 +11,7 @@ use App\Models\Post;
 
 use App\Models\PostAttachment;
 use App\Models\PostComment;
-use App\Models\PostReaction;
+use App\Models\Reaction;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Contracts\Routing\ResponseFactory;
@@ -132,23 +132,28 @@ class PostController extends Controller
     {
         $userId = Auth::id();
         $data = $request->validate([
-           'reaction' => [Rule::enum(PostReactionEnum::class)],
+           'reaction' => [Rule::enum(ReactionEnum::class)],
         ]);
 
-        $reaction = PostReaction::where('user_id', $userId)->where('post_id', $post->id)->first();
+        $reaction = Reaction::where('user_id', $userId)
+            ->where('object_id', $post->id)
+            ->where('object_type', Post::class)
+            ->first();
+
         $hasReaction = $reaction === null;
 
         if ($reaction) {
             $reaction->delete();
         } else {
-            PostReaction::create([
+            Reaction::create([
                 'type' => $data['reaction'],
                 'user_id' => $userId,
-                'post_id' => $post->id,
+                'object_id' => $post->id,
+                'object_type' => Post::class,
             ]);
         }
 
-        $reactions_count = PostReaction::where('post_id', $post->id)->count();
+        $reactions_count = Reaction::where('object_id', $post->id)->where('object_type', Post::class)->count();
 
         return response([
             'number_of_reactions' => $reactions_count,
@@ -200,6 +205,43 @@ class PostController extends Controller
 
         return response(new PostCommentResource($comment), 201);
     }
+
+    /**
+     * Add a reaction to a specific comment.
+     */
+    public function commentReaction(Request $request, PostComment $comment): Application|Response|ContractApplication|ResponseFactory
+    {
+        $userId = Auth::id();
+        $data = $request->validate([
+            'reaction' => [Rule::enum(ReactionEnum::class)],
+        ]);
+
+        $reaction = Reaction::where('user_id', $userId)
+            ->where('object_id', $comment->id)
+            ->where('object_type', PostComment::class)
+            ->first();
+
+        $hasReaction = $reaction === null;
+
+        if ($reaction) {
+            $reaction->delete();
+        } else {
+            Reaction::create([
+                'type' => $data['reaction'],
+                'user_id' => $userId,
+                'object_id' => $comment->id,
+                'object_type' => PostComment::class,
+            ]);
+        }
+
+        $reactions_count = Reaction::where('object_id', $comment->id)->where('object_type', PostComment::class)->count();
+
+        return response([
+            'number_of_reactions' => $reactions_count,
+            'current_user_has_reaction' => $hasReaction
+        ], 201);
+    }
+
 
     /**
      * Add the specified attachments to the storage.
