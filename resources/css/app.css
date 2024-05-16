@@ -94,3 +94,17 @@
     text-decoration: underline;
     color: #4b9afa;
 }
+
+
+.comment-list::-webkit-scrollbar {
+    width: 8px;
+}
+
+.comment-list::-webkit-scrollbar-thumb {
+    background-color: #a2c3de;
+    border-radius: 6px;
+}
+
+.comment-list::-webkit-scrollbar-track {
+    background-color: #f1f1f3;
+}

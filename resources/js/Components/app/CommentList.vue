@@ -1,7 +1,6 @@
 <script setup>
 
 import { ChatBubbleLeftEllipsisIcon, HandThumbUpIcon } from "@heroicons/vue/24/outline/index.js";
-import { usePage } from "@inertiajs/vue3";
 import { Disclosure, DisclosureButton, DisclosurePanel } from "@headlessui/vue";
 import { ref } from "vue";
 
@@ -11,9 +10,6 @@ import EditDeleteDropdown from "@/Components/app/EditDeleteDropdown.vue";
 import InputTextarea from "@/Components/InputTextarea.vue";
 import IndigoButton from "@/Components/IndigoButton.vue";
 import ReadMoreReadLess from "@/Components/ReadMoreReadLess.vue";
-
-
-const authUser = usePage().props.auth.user;
 
 
 const newComment = ref("");
@@ -28,6 +24,10 @@ const props = defineProps({
         default: null,
     }
 });
+const emit = defineEmits([
+    'commentCreate',
+    'commentDelete',
+]);
 
 
 function createComment() {
@@ -42,6 +42,7 @@ function createComment() {
                 props.parentComment.number_of_comments++;
             }
             props.post.number_of_comments++;
+            emit('commentCreate');
         });
 }
 
@@ -63,6 +64,7 @@ function deleteComment(commentId) {
                     props.parentComment.number_of_comments--;
                 }
                 props.post.number_of_comments--;
+                emit('commentDelete');
             });
     }
 }
@@ -90,17 +92,24 @@ function sendCommentReaction(comment) {
         });
 }
 
+function onCommentCreate() {
+    if (props.parentComment) {
+        props.parentComment.number_of_comments++;
+    }
+    emit('commentCreate');
+}
+
+function onCommentDelete() {
+    if (props.parentComment) {
+        props.parentComment.number_of_comments--;
+    }
+    emit('commentDelete');
+}
+
 </script>
 
 <template>
-    <div class="flex gap-2 mb-5">
-        <a href="javascript:void(0)">
-            <img
-                :src="authUser.avatar_url"
-                alt="Some avatar"
-                class="w-[40px] h-[40px] rounded-full border border-2 transition-all hover:border-blue-500"
-            />
-        </a>
+    <div class="mb-5">
         <div class="flex flex-1">
             <InputTextarea
                 v-model="newComment"
@@ -193,6 +202,8 @@ function sendCommentReaction(comment) {
                             :post="post"
                             :data="{ comments: comment.comments }"
                             :parent-comment="comment"
+                            @comment-create="onCommentCreate"
+                            @comment-delete="onCommentDelete"
                         />
                     </DisclosurePanel>
                 </Disclosure>
