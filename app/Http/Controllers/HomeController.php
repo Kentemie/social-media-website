@@ -4,13 +4,15 @@ namespace App\Http\Controllers;
 
 use App\Http\Resources\PostResource;
 use App\Models\Post;
+use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
+use Illuminate\Http\Request;
 use Inertia\Response;
 
 class HomeController extends Controller
 {
-    public function index(): Response
+    public function index(Request $request): AnonymousResourceCollection|Response
     {
         $userId = Auth::id();
         $posts = Post::query()
@@ -26,8 +28,14 @@ class HomeController extends Controller
             ->latest()
             ->paginate(20);
 
+        $posts = PostResource::collection($posts);
+
+        if ($request->wantsJson()) {
+            return $posts;
+        }
+
         return Inertia::render('Home', [
-            'posts' => PostResource::collection($posts),
+            'posts' => $posts,
         ]);
     }
 }

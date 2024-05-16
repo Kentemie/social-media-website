@@ -31,15 +31,6 @@ function showCreatePostModal() {
         >
             Click here to create a new post
         </div>
-<!--        <div v-if="showModal" class="flex gap-2 justify-between">-->
-<!--            <button type="submit" class="rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 relative">-->
-<!--                Attach files-->
-<!--                <input type="file" class="absolute top-0 bottom-0 left-0 right-0 opacity-0">-->
-<!--            </button>-->
-<!--            <button @click="submitPostCreation" type="submit" class="rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">-->
-<!--                Submit-->
-<!--            </button>-->
-<!--        </div>-->
         <PostModal :post="newPost" v-model="showModal" />
     </div>
 </template>
