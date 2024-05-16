@@ -96,11 +96,12 @@ function closeModal() {
 
 function resetModal() {
     form.reset();
-    showExtensionsText.value = false;
     attachmentFiles.value = [];
     attachmentErrors.value = [];
     formErrors.value = {};
-    props.post.attachments.forEach(attachment => attachment.deleted = false);
+    if (props.post.attachments) {
+        props.post.attachments.forEach(attachment => attachment.deleted = false);
+    }
 }
 
 async function onAttachmentChoose(event) {
