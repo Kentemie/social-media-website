@@ -5,13 +5,14 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 
 class PostComment extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['comment', 'user_id', 'post_id'];
+    protected $fillable = ['comment', 'user_id', 'post_id', 'parent_id'];
 
     public function user(): BelongsTo
     {
@@ -26,5 +27,10 @@ class PostComment extends Model
     public function reactions(): morphMany
     {
         return $this->morphMany(Reaction::class, 'object');
+    }
+
+    public function comments(): HasMany
+    {
+        return $this->hasMany(self::class, 'parent_id');
     }
 }
