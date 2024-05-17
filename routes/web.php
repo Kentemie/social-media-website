@@ -13,6 +13,9 @@ Route::get('/', [HomeController::class, 'index'])
 Route::get('user/{user:username}', [ProfileController::class, 'index'])
     ->name('profile');
 
+Route::get('group/{group:slug}', [GroupController::class, 'show'])
+    ->name('group.profile');
+
 Route::middleware('auth')
     ->group(function () {
         # Profile routes
@@ -20,6 +23,8 @@ Route::middleware('auth')
         Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
         Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
+        #Group routes
+        Route::post('/group/update-images/{group:slug}', [GroupController::class, 'updateImage'])->name('group.updateImage');
 
         # Post routes
         Route::post('/post', [PostController::class, 'store'])->name('post.store');
