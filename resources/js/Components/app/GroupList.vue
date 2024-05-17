@@ -1,6 +1,14 @@
 <script setup>
 import { Disclosure, DisclosureButton, DisclosurePanel } from "@headlessui/vue";
+import { ChevronRightIcon } from "@heroicons/vue/24/solid";
+import { ref } from "vue";
+
 import GroupListItems from "@/Components/app/GroupListItems.vue";
+import GroupModal from "@/Components/app/GroupModal.vue";
+
+
+const showNewGroupModal = ref(false)
+
 </script>
 
 <template>
@@ -9,28 +17,27 @@ import GroupListItems from "@/Components/app/GroupListItems.vue";
             <Disclosure v-slot="{ open }">
                 <DisclosureButton class="w-full">
                     <div class="flex justify-between items-center">
-                        <h2 class="text-xl font-bold">
-                            My groups
-                        </h2>
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-5 h-5 transition-all" :class="open ? 'rotate-90 transform' : ''">
-                            <path fill-rule="evenodd" d="M16.28 11.47a.75.75 0 0 1 0 1.06l-7.5 7.5a.75.75 0 0 1-1.06-1.06L14.69 12 7.72 5.03a.75.75 0 0 1 1.06-1.06l7.5 7.5Z" clip-rule="evenodd" />
-                        </svg>
+                        <h2 class="text-xl font-bold">My groups</h2>
+                        <ChevronRightIcon class="w-5 h-5 transition-all" :class="open ? 'rotate-90 transform' : ''" />
                     </div>
                 </DisclosureButton>
                 <DisclosurePanel>
+                    <button @click="showNewGroupModal = true" class="text-sm bg-indigo-500 hover:bg-indigo-600 text-white rounded py-1 px-2">
+                        new group
+                    </button>
                     <GroupListItems />
                 </DisclosurePanel>
             </Disclosure>
         </div>
         <div class="h-full hidden lg:flex lg:flex-col">
-            <h2 class="text-xl font-bold text-center">
-                My groups
-            </h2>
+            <div class="flex justify-between">
+                <h2 class="text-xl font-bold">My groups</h2>
+                <button @click="showNewGroupModal = true" class="text-sm bg-indigo-500 hover:bg-indigo-600 text-white rounded py-1 px-2">
+                    new group
+                </button>
+            </div>
             <GroupListItems />
         </div>
     </div>
+    <GroupModal v-model="showNewGroupModal" />
 </template>
-
-<style scoped>
-
-</style>

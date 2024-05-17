@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\GroupController;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\HomeController;
@@ -27,10 +28,14 @@ Route::middleware('auth')
         Route::get('/post/download/{post_attachment}', [PostController::class, 'downloadAttachment'])->name('post.download');
         Route::post('/post/{post}/reaction', [PostController::class, 'postReaction'])->name('post.reaction');
 
+        # Comment routes
         Route::post('/post/{post}/comment', [PostController::class, 'createComment'])->name('post.comment.create');
         Route::delete('/post/comment/{comment}', [PostController::class, 'deleteComment'])->name('post.comment.delete');
         Route::put('/post/comment/{comment}', [PostController::class, 'updateComment'])->name('post.comment.update');
         Route::post('/post/comment/{comment}/reaction', [PostController::class, 'commentReaction'])->name('post.comment.reaction');
+
+        # Group routes
+        Route::post('/group', [GroupController::class, 'store'])->name('group.store');
     }
 );
 
