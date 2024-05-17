@@ -5,6 +5,7 @@ namespace App\Http\Resources;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 class PostCommentResource extends JsonResource
 {
@@ -18,6 +19,7 @@ class PostCommentResource extends JsonResource
         return [
             'id' => $this->id,
             'comment' => $this->comment,
+            'short_comment' => Str::words($this->comment, 20),
             'number_of_reactions' => $this->reactions_count,
             'number_of_comments' => $this->numberOfComments,
             'current_user_has_reaction' => $this->reactions->count() > 0,

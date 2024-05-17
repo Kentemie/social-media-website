@@ -30,7 +30,8 @@ const props = defineProps({
 const emit = defineEmits(
     [
         "update:modelValue",
-        "hide"
+        "hide",
+        "create",
     ],
 );
 
@@ -63,8 +64,9 @@ function resetModal() {
 
 function submit() {
     axiosClient.post(route("group.store"), form)
-        .then(() => {
+        .then(({ data }) => {
             closeModal();
+            emit("create", data);
         });
 }
 

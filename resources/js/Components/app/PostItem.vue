@@ -55,7 +55,7 @@ function sendPostReaction() {
             <EditDeleteDropdown :user="post.user" @edit="openPostEditModal" @delete="deletePost" />
         </div>
         <div class="mb-2">
-            <ReadMoreReadLess :content="post.body" />
+            <ReadMoreReadLess :content="post.body" :short-content="post.short_body" />
         </div>
         <div v-if="post.attachments.length !== 0" class="grid gap-3 mb-3" :class="[
             post.attachments.length === 1 ? 'grid-cols-1' : 'grid-cols-2 lg:grid-cols-3'

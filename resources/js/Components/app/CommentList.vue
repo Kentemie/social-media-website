@@ -172,6 +172,7 @@ function onCommentDelete() {
                 <ReadMoreReadLess
                     v-else
                     :content="comment.comment"
+                    :short-content="comment.short_comment"
                     content-class="text-sm flex flex-1"
                 />
                 <Disclosure v-slot="{ open }">

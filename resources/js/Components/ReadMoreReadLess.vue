@@ -6,6 +6,9 @@ defineProps({
     content: {
         type: String,
     },
+    shortContent: {
+        type: String,
+    },
     contentClass: {
         type: String,
     }
@@ -15,8 +18,8 @@ defineProps({
 
 <template>
     <Disclosure v-slot="{ open }">
-        <div v-if="!open" :class="contentClass" v-html="content.substring(0, 200)" class="ck-content-output" />
-        <div v-if="content && content.length > 200">
+        <div v-if="!open" :class="contentClass" v-html="shortContent" class="ck-content-output" />
+        <div v-if="content && content.length > shortContent.length">
             <DisclosurePanel>
                 <div v-html="content" :class="contentClass" class="ck-content-output" />
             </DisclosurePanel>
