@@ -30,6 +30,7 @@ Route::middleware('auth')
         #Group routes
         Route::post('/group/update-images/{group:slug}', [GroupController::class, 'updateImage'])->name('group.updateImage');
         Route::post('/group/invite/{group:slug}', [GroupController::class, 'inviteUsers'])->name('group.inviteUsers');
+        Route::post('/group/join/{group:slug}', [GroupController::class, 'joinGroup'])->name('group.joinGroup');
 
         # Post routes
         Route::post('/post', [PostController::class, 'store'])->name('post.store');

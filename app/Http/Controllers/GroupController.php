@@ -12,16 +12,17 @@ use App\Models\Group;
 use App\Models\GroupUser;
 use App\Notifications\InvitationApproved;
 use App\Notifications\InvitationToGroup;
+use App\Notifications\RequestToJoinGroup;
 use Carbon\Carbon;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Inertia\Inertia;
 use Inertia\Response;
-use Symfony\Component\HttpFoundation\Exception\BadRequestException;
 
 class GroupController extends Controller
 {
@@ -182,5 +183,29 @@ class GroupController extends Controller
         $adminUser->notify(new InvitationApproved($groupUser->group, $groupUser->user));
 
         return redirect(route('group.profile', $groupUser->group->slug))->with('success', 'You have been accepted into the "'.$groupUser->group->name.'" group.');
+    }
+
+    public function joinGroup(Group $group)
+    {
+        $user = \request()->user();
+        $status = GroupUserStatus::APPROVED->value;
+        $success = 'You have joined the "'.$group->name.'" group.';
+
+        if (!$group->auto_approval) {
+            $status = GroupUserStatus::PENDING->value;
+            $success = 'Your request has been accepted. You will be notified as soon as your request is approved.';
+
+            Notification::send($group->adminUsers, new RequestToJoinGroup($group, $user));
+        }
+
+        GroupUser::create([
+            'status' => $status,
+            'role' => GroupUserRole::USER->value,
+            'user_id' => $user->id,
+            'group_id' => $group->id,
+            'created_by' => $user->id,
+        ]);
+
+        return back()->with('success', $success);
     }
 }
