@@ -16,7 +16,7 @@ Route::get('user/{user:username}', [ProfileController::class, 'index'])
 Route::get('group/{group:slug}', [GroupController::class, 'show'])
     ->name('group.profile');
 
-Route::get('/group/request/{token}', [GroupController::class, 'approveInvitation'])
+Route::get('/group/approve-invitation/{token}', [GroupController::class, 'approveInvitation'])
     ->name('group.approveInvitation');
 
 
@@ -31,6 +31,7 @@ Route::middleware('auth')
         Route::post('/group/update-images/{group:slug}', [GroupController::class, 'updateImage'])->name('group.updateImage');
         Route::post('/group/invite/{group:slug}', [GroupController::class, 'inviteUsers'])->name('group.inviteUsers');
         Route::post('/group/join/{group:slug}', [GroupController::class, 'joinGroup'])->name('group.joinGroup');
+        Route::post('/group/approve-request/{group:slug}', [GroupController::class, 'processRequest'])->name('group.processRequest');
 
         # Post routes
         Route::post('/post', [PostController::class, 'store'])->name('post.store');

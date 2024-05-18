@@ -1,6 +1,6 @@
 <script setup>
 import TextInput from "@/Components/TextInput.vue";
-import FollowerItem from "@/Components/app/FollowerItem.vue";
+import UserListItem from "@/Components/app/UserListItem.vue";
 import { ref } from "vue";
 
 const searchKeyword = ref('');
@@ -13,60 +13,6 @@ const searchKeyword = ref('');
             You have no friends, you are a lonely pathetic slug
         </div>
         <div v-else>
-            <FollowerItem image="https://picsum.photos/100"
-                          title="Jon Snow"
-            />
-            <FollowerItem image="https://picsum.photos/100"
-                          title="Daenerys Targaryen"
-            />
-            <FollowerItem image="https://picsum.photos/100"
-                          title="Jon Snow"
-            />
-            <FollowerItem image="https://picsum.photos/100"
-                          title="Daenerys Targaryen"
-            />
-            <FollowerItem image="https://picsum.photos/100"
-                          title="Jon Snow"
-            />
-            <FollowerItem image="https://picsum.photos/100"
-                          title="Daenerys Targaryen"
-            />
-            <FollowerItem image="https://picsum.photos/100"
-                          title="Jon Snow"
-            />
-            <FollowerItem image="https://picsum.photos/100"
-                          title="Daenerys Targaryen"
-            />
-            <FollowerItem image="https://picsum.photos/100"
-                          title="Jon Snow"
-            />
-            <FollowerItem image="https://picsum.photos/100"
-                          title="Daenerys Targaryen"
-            />
-            <FollowerItem image="https://picsum.photos/100"
-                          title="Jon Snow"
-            />
-            <FollowerItem image="https://picsum.photos/100"
-                          title="Daenerys Targaryen"
-            />
-            <FollowerItem image="https://picsum.photos/100"
-                          title="Jon Snow"
-            />
-            <FollowerItem image="https://picsum.photos/100"
-                          title="Daenerys Targaryen"
-            />
-            <FollowerItem image="https://picsum.photos/100"
-                          title="Jon Snow"
-            />
-            <FollowerItem image="https://picsum.photos/100"
-                          title="Daenerys Targaryen"
-            />
-            <FollowerItem image="https://picsum.photos/100"
-                          title="Jon Snow"
-            />
-            <FollowerItem image="https://picsum.photos/100"
-                          title="Daenerys Targaryen"
-            />
 
         </div>
     </div>

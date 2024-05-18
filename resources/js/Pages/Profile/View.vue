@@ -7,7 +7,7 @@ import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
 import TabItem from "@/Pages/Profile/Partials/TabItem.vue";
 import Edit from "@/Pages/Profile/Edit.vue";
 
-import { computed, ref, watch } from "vue";
+import { computed, ref } from "vue";
 
 const authUser = usePage().props.auth.user;
 const props = defineProps({
@@ -102,7 +102,7 @@ const isMyProfile = computed(() => authUser && props.user.id === authUser.id);
             </div>
             <div class="group relative bg-white">
                 <img
-                    :src="coverImageSource || user.cover_url || '/images/default_cover_image.jpg'"
+                    :src="coverImageSource || user.cover_url"
                     alt="Some cover image"
                     class="w-full h-[200px] object-cover"
                 >
@@ -140,7 +140,7 @@ const isMyProfile = computed(() => authUser && props.user.id === authUser.id);
                 <div class="flex">
                     <div class="flex items-center justify-center group/avatar relative ml-[48px] w-[128px] h-[128px] -mt-[64px]">
                         <img
-                            :src="avatarImageSource || user.avatar_url || '/images/default_avatar_image.webp'"
+                            :src="avatarImageSource || user.avatar_url"
                             alt="Some avatar"
                             class="w-full h-full object-cover rounded-full"
                         >
