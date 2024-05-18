@@ -11,14 +11,14 @@ import {
     XMarkIcon,
     BookmarkIcon,
 } from "@heroicons/vue/24/solid";
-import { useForm } from "@inertiajs/vue3";
+import { useForm, usePage } from "@inertiajs/vue3";
 
-import axiosClient from "@/axiosClient.js";
 
 import IndigoButton from "@/Components/IndigoButton.vue";
 import TextInput from "@/Components/TextInput.vue";
-import Checkbox from "@/Components/Checkbox.vue";
-import InputTextarea from "@/Components/InputTextarea.vue";
+
+
+const page = usePage();
 
 
 const props = defineProps({
@@ -36,9 +36,7 @@ const emit = defineEmits(
 
 
 const form = useForm({
-    name: "",
-    description: "",
-    auto_approval: true,
+    email: "",
 });
 
 
@@ -61,11 +59,15 @@ function resetModal() {
 }
 
 function submit() {
-    axiosClient.post(route("group.store"), form)
-        .then(({ data }) => {
-            closeModal();
-            emit("create", data);
-        });
+    form.post(route('group.inviteUsers', page.props.group.slug), {
+        onSuccess(res) {
+            console.log(res);
+            closeModal()
+        },
+        onError(err) {
+            console.log(err);
+        }
+    })
 }
 
 </script>
@@ -98,8 +100,7 @@ function submit() {
                         >
                             <DialogPanel class="w-full max-w-md transform overflow-hidden rounded bg-white text-left align-middle shadow-xl transition-all">
                                 <DialogTitle as="h3" class="flex items-center justify-between py-3 px-4 font-medium bg-gray-100 text-gray-900">
-                                    Create a new group
-
+                                    Invite users
                                     <button @click="closeModal" class="w-8 h-8 rounded-full hover:bg-black/10 transition flex items-center justify-center">
                                         <XMarkIcon class="w-4 h-4" />
                                     </button>
@@ -107,30 +108,16 @@ function submit() {
 
                                 <div class="p-4">
                                     <div class="mb-3">
-                                        <label>Group name</label>
+                                        <label>Username or email</label>
                                         <TextInput
                                             type="text"
                                             class="mt-1 block w-full"
-                                            v-model="form.name"
+                                            :class="page.props.errors.email ? 'border-red-500 focus:border-red-500 focus:ring-red-500' : ''"
+                                            v-model="form.email"
                                             required
                                             autofocus
                                         />
-                                    </div>
-                                    <div class="mb-3">
-                                        <label>
-                                            Enable automatic approval
-                                            <Checkbox
-                                                v-model:checked="form.auto_approval"
-                                                name="remember"
-                                            />
-                                        </label>
-                                    </div>
-                                    <div class="mb-3">
-                                        <label>Group description</label>
-                                        <InputTextarea
-                                            v-model="form.description"
-                                            class="w-full"
-                                        />
+                                        <div class="text-red-500">{{ page.props.errors.email }}</div>
                                     </div>
                                 </div>
 

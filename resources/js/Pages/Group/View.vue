@@ -3,12 +3,13 @@ import { TabGroup, TabList, Tab, TabPanels, TabPanel } from '@headlessui/vue'
 import { useForm, usePage } from "@inertiajs/vue3";
 import { XMarkIcon, CheckCircleIcon, CameraIcon } from "@heroicons/vue/24/solid";
 import { CameraIcon as CameraIconOutline } from "@heroicons/vue/24/outline";
-import { computed, ref, watch } from "vue";
+import { computed, ref } from "vue";
 
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
 import TabItem from "@/Pages/Profile/Partials/TabItem.vue";
 
 import PrimaryButton from "@/Components/PrimaryButton.vue";
+import InviteUserModal from "@/Pages/Group/Partials/InviteUserModal.vue";
 
 
 const authUser = usePage().props.auth.user;
@@ -34,7 +35,8 @@ const props = defineProps({
 
 const coverImageSource = ref("");
 const thumbnailImageSource = ref("");
-const showNotification = ref(false);
+const showNotification = ref(true);
+const showInviteUserModal = ref(false);
 
 const isCurrentUserAdmin = computed(() => props.group.role === "admin");
 
@@ -170,7 +172,7 @@ function submitImageUpdate(resetFunction) {
                     <div class="flex flex-1 justify-between items-center p-4">
                         <h2 class="font-bold text-lg">{{ group.name }}</h2>
 
-                        <PrimaryButton v-if="isCurrentUserAdmin">Invite users</PrimaryButton>
+                        <PrimaryButton @click="showInviteUserModal = true" v-if="isCurrentUserAdmin">Invite users</PrimaryButton>
                         <PrimaryButton v-if="!group.role && group.auto_approval">Join the group</PrimaryButton>
                         <PrimaryButton v-if="!group.role && !group.auto_approval">Request to join</PrimaryButton>
                     </div>
@@ -212,6 +214,7 @@ function submitImageUpdate(resetFunction) {
             </div>
         </div>
     </AuthenticatedLayout>
+    <InviteUserModal v-model="showInviteUserModal" />
 </template>
 
 <style scoped>
