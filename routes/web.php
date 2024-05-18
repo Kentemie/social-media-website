@@ -32,6 +32,7 @@ Route::middleware('auth')
         Route::post('/group/invite/{group:slug}', [GroupController::class, 'inviteUsers'])->name('group.inviteUsers');
         Route::post('/group/join/{group:slug}', [GroupController::class, 'joinGroup'])->name('group.joinGroup');
         Route::post('/group/approve-request/{group:slug}', [GroupController::class, 'processRequest'])->name('group.processRequest');
+        Route::post('/group/change-role/{group:slug}', [GroupController::class, 'changeRole'])->name('group.changeRole');
 
         # Post routes
         Route::post('/post', [PostController::class, 'store'])->name('post.store');

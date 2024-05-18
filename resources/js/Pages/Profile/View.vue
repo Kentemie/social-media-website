@@ -72,6 +72,7 @@ function resetAvatarImageUpdate() {
 
 function submitImageUpdate(resetFunction) {
     imagesForm.post(route("profile.updateImage"), {
+        preserveScroll: true,
         onSuccess: () => {
             resetFunction();
             showNotification.value = true;

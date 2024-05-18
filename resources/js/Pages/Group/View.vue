@@ -87,6 +87,7 @@ function resetThumbnailImageUpdate() {
 
 function submitImageUpdate(resetFunction) {
     imagesForm.post(route("group.updateImage", props.group.slug), {
+        preserveScroll: true,
         onSuccess: () => {
             resetFunction();
             showNotification.value = true;
@@ -99,7 +100,9 @@ function submitImageUpdate(resetFunction) {
 
 function joinToGroup() {
     const form = useForm({});
-    form.post(route("group.joinGroup", props.group.slug));
+    form.post(route("group.joinGroup", props.group.slug), {
+        preserveScroll: true,
+    });
 }
 
 function approveRequest(userId) {
@@ -107,7 +110,9 @@ function approveRequest(userId) {
         user_id: userId,
         action: "approve"
     });
-    form.post(route("group.processRequest", props.group.slug));
+    form.post(route("group.processRequest", props.group.slug), {
+        preserveScroll: true,
+    });
 }
 
 function rejectRequest(userId) {
@@ -115,7 +120,19 @@ function rejectRequest(userId) {
         user_id: userId,
         action: "reject"
     });
-    form.post(route("group.processRequest", props.group.slug));
+    form.post(route("group.processRequest", props.group.slug), {
+        preserveScroll: true,
+    });
+}
+
+function onRoleChange(userId, role) {
+    const form = useForm({
+        user_id: userId,
+        role: role
+    });
+    form.post(route("group.changeRole", props.group.slug), {
+        preserveScroll: true,
+    });
 }
 
 </script>
@@ -242,7 +259,10 @@ function rejectRequest(userId) {
                                     v-for="user in users"
                                     :user="user"
                                     :key="user.id"
+                                    :show-role-dropdown="isCurrentUserAdmin"
+                                    :disable-role-dropdown="group.user_id === user.id"
                                     class="shadow rounded-lg"
+                                    @role-change="onRoleChange"
                                 />
                             </div>
                         </TabPanel>
