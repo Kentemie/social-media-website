@@ -12,14 +12,10 @@ import PrimaryButton from "@/Components/PrimaryButton.vue";
 import InviteUserModal from "@/Pages/Group/Partials/InviteUserModal.vue";
 import UserListItem from "@/Components/app/UserListItem.vue";
 import TextInput from "@/Components/TextInput.vue";
+import GroupForm from "@/Components/app/GroupForm.vue";
 
 
 const authUser = usePage().props.auth.user;
-
-const imagesForm = useForm({
-    cover: null,
-    thumbnail: null,
-});
 
 
 const props = defineProps({
@@ -38,6 +34,17 @@ const props = defineProps({
     errors: {
         type: Object,
     },
+});
+
+
+const imagesForm = useForm({
+    cover: null,
+    thumbnail: null,
+});
+const groupForm = useForm({
+    name: props.group.name,
+    description: props.group.description,
+    auto_approval: !!props.group.auto_approval,
 });
 
 
@@ -133,6 +140,12 @@ function onRoleChange(userId, role) {
     form.post(route("group.changeRole", props.group.slug), {
         preserveScroll: true,
     });
+}
+
+function update() {
+    groupForm.put(route('group.update', props.group.slug), {
+        preserveScroll: true,
+    })
 }
 
 </script>
@@ -245,6 +258,9 @@ function onRoleChange(userId, role) {
                         <Tab v-slot="{ selected }" as="template">
                             <TabItem text="Photos" :selected="selected" />
                         </Tab>
+                        <Tab v-if="isCurrentUserAdmin" v-slot="{ selected }" as="template">
+                            <TabItem text="Description" :selected="selected" />
+                        </Tab>
                     </TabList>
                     <TabPanels class="mt-2">
                         <TabPanel class="bg-white p-3 shadow">
@@ -285,7 +301,12 @@ function onRoleChange(userId, role) {
                         <TabPanel class="bg-white p-3 shadow">
                             Photos
                         </TabPanel>
-
+                        <TabPanel class="bg-white p-3 shadow">
+                            <GroupForm :form="groupForm" />
+                            <PrimaryButton @click="update">
+                                submit
+                            </PrimaryButton>
+                        </TabPanel>
                     </TabPanels>
                 </TabGroup>
             </div>

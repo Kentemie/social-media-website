@@ -19,6 +19,7 @@ import IndigoButton from "@/Components/IndigoButton.vue";
 import TextInput from "@/Components/TextInput.vue";
 import Checkbox from "@/Components/Checkbox.vue";
 import InputTextarea from "@/Components/InputTextarea.vue";
+import GroupForm from "@/Components/app/GroupForm.vue";
 
 
 const props = defineProps({
@@ -106,32 +107,7 @@ function submit() {
                                 </DialogTitle>
 
                                 <div class="p-4">
-                                    <div class="mb-3">
-                                        <label>Group name</label>
-                                        <TextInput
-                                            type="text"
-                                            class="mt-1 block w-full"
-                                            v-model="form.name"
-                                            required
-                                            autofocus
-                                        />
-                                    </div>
-                                    <div class="mb-3">
-                                        <label>
-                                            Enable automatic approval
-                                            <Checkbox
-                                                v-model:checked="form.auto_approval"
-                                                name="remember"
-                                            />
-                                        </label>
-                                    </div>
-                                    <div class="mb-3">
-                                        <label>Group description</label>
-                                        <InputTextarea
-                                            v-model="form.description"
-                                            class="w-full"
-                                        />
-                                    </div>
+                                    <GroupForm :form="form" />
                                 </div>
 
                                 <div class="flex gap-2 py-3 px-4 justify-end">

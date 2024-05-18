@@ -80,9 +80,10 @@ class GroupController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdateGroupRequest $request, Group $group)
+    public function update(UpdateGroupRequest $request, Group $group): RedirectResponse
     {
-        //
+        $group->update($request->validated());
+        return back()->with('success', 'Group updated successfully');
     }
 
     /**

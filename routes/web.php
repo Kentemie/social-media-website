@@ -28,6 +28,8 @@ Route::middleware('auth')
         Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
         #Group routes
+        Route::post('/group', [GroupController::class, 'store'])->name('group.store');
+        Route::put('/group/{group:slug}', [GroupController::class, 'update'])->name('group.update');
         Route::post('/group/update-images/{group:slug}', [GroupController::class, 'updateImage'])->name('group.updateImage');
         Route::post('/group/invite/{group:slug}', [GroupController::class, 'inviteUsers'])->name('group.inviteUsers');
         Route::post('/group/join/{group:slug}', [GroupController::class, 'joinGroup'])->name('group.joinGroup');
@@ -46,9 +48,6 @@ Route::middleware('auth')
         Route::delete('/post/comment/{comment}', [PostController::class, 'deleteComment'])->name('post.comment.delete');
         Route::put('/post/comment/{comment}', [PostController::class, 'updateComment'])->name('post.comment.update');
         Route::post('/post/comment/{comment}/reaction', [PostController::class, 'commentReaction'])->name('post.comment.reaction');
-
-        # Group routes
-        Route::post('/group', [GroupController::class, 'store'])->name('group.store');
     }
 );
 
