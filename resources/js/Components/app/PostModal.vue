@@ -1,19 +1,18 @@
 <script setup>
-
-import { computed, watch, ref } from 'vue';
+import { computed, watch, ref } from "vue";
 import {
     TransitionRoot,
     TransitionChild,
     Dialog,
     DialogPanel,
     DialogTitle,
-} from '@headlessui/vue';
+} from "@headlessui/vue";
 import {
     XMarkIcon,
     PaperClipIcon,
     BookmarkIcon,
     ArrowUturnLeftIcon,
-} from '@heroicons/vue/24/solid';
+} from "@heroicons/vue/24/solid";
 import { useForm, usePage } from "@inertiajs/vue3";
 import { readFile, isImage } from "@/helpers.js";
 
@@ -25,7 +24,7 @@ import IndigoButton from "@/Components/IndigoButton.vue";
 const editor = ClassicEditor;
 const editorConfig = {
     toolbar: [
-        'bold', 'italic', '|', 'bulletedList', 'numberedList', '|', 'heading', '|', 'outdent', 'indent', '|', 'link', '|', 'blockQuote'
+        "bold", "italic", "|", "bulletedList", "numberedList", "|", "heading", "|", "outdent", "indent", "|", "link", "|", "blockQuote"
     ]
 };
 
@@ -44,7 +43,7 @@ const props = defineProps({
     },
 });
 const emit = defineEmits(
-    ['update:modelValue', 'hide'],
+    ["update:modelValue", "hide"],
 );
 
 const attachmentFiles = ref([]);
@@ -56,7 +55,7 @@ const show = computed({
         return props.modelValue;
     },
     set(value) {
-        emit('update:modelValue', value);
+        emit("update:modelValue", value);
     }
 });
 const attachments = computed(() => {
@@ -65,7 +64,7 @@ const attachments = computed(() => {
 const showExtensionsText = computed(() => {
     for (const myFile of attachmentFiles.value) {
         const file = myFile.file;
-        const ext = file.name.split('.').pop().toLowerCase();
+        const ext = file.name.split(".").pop().toLowerCase();
         if (!attachmentExtensions.includes(ext)) {
             return true;
         }
@@ -74,23 +73,23 @@ const showExtensionsText = computed(() => {
 });
 
 watch(() => props.post, () => {
-    form.body = props.post.body ?? '';
+    form.body = props.post.body ?? "";
 }, {
     deep: true,
 });
 
 
 const form = useForm({
-    body: '',
+    body: "",
     attachments: [],
     deleted_attachment_ids: [],
-    _method: 'POST',
+    _method: "POST",
 });
 
 
 function closeModal() {
     show.value = false;
-    emit('hide');
+    emit("hide");
     resetModal();
 }
 
@@ -129,37 +128,37 @@ function undoFileRemoval(myFile) {
     form.deleted_attachment_ids = form.deleted_attachment_ids.filter(id => myFile.id !== id);
 }
 
-function proccessErrors(errors) {
+function processErrors(errors) {
     formErrors.value = errors
     for (const key in errors) {
-        if (key.includes('.')) {
-            const [, index] = key.split('.');
+        if (key.includes(".")) {
+            const [, index] = key.split(".");
             attachmentErrors.value[index] = errors[key];
         }
     }
 }
 
-function submitPost() {
+function submit() {
     form.attachments = attachmentFiles.value.map(myFile => myFile.file);
     if (props.post.id) {
-        form._method = 'PUT';
-        form.post(route('post.update', props.post.id), {
+        form._method = "PUT";
+        form.post(route("post.update", props.post.id), {
             preserveScroll: true,
             onSuccess() {
                 closeModal();
             },
             onError(errors) {
-                proccessErrors(errors)
+                processErrors(errors);
             }
         });
     } else {
-        form.post(route('post.store'), {
+        form.post(route("post.store"), {
             preserveScroll: true,
             onSuccess() {
                 closeModal();
             },
             onError(errors) {
-                proccessErrors(errors)
+                processErrors(errors);
             }
         });
     }
@@ -218,7 +217,7 @@ function submitPost() {
                                     >
                                         Files must have one of the following extensions: <br>
                                         <small>
-                                            {{ attachmentExtensions.join(', ') }}
+                                            {{ attachmentExtensions.join(", ") }}
                                         </small>
                                     </div>
 
@@ -288,7 +287,7 @@ function submitPost() {
                                         <input @click.stop @change="onAttachmentChoose" type="file" multiple class="absolute left-0 right-0 top-0 bottom-0 opacity-0">
                                     </IndigoButton>
                                     <IndigoButton
-                                        @click="submitPost"
+                                        @click="submit"
                                         class="w-full"
                                     >
                                         <BookmarkIcon class="w-4 h-4 mr-2" />

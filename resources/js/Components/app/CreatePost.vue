@@ -12,7 +12,7 @@ const authUser = usePage().props.auth.user;
 const showModal = ref(false);
 const newPost = ref({
     id: 0,
-    body: '',
+    body: "",
     user: authUser,
 });
 

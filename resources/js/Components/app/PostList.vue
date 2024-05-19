@@ -1,6 +1,6 @@
 <script setup>
 
-import { onMounted, ref } from "vue";
+import { onMounted, ref, watch } from "vue";
 import { usePage } from "@inertiajs/vue3";
 
 import axiosClient from "@/axiosClient.js";
@@ -11,6 +11,7 @@ import PostAttachmentPreviewModal from "@/Components/app/PostAttachmentPreviewMo
 
 
 const authUser = usePage().props.auth.user;
+
 
 const props = defineProps({
     posts: {
@@ -24,10 +25,23 @@ const showAttachmentPreviewModal = ref(false);
 const editPost = ref({});
 const postAttachmentsPreview = ref({});
 const loadMoreIntersect = ref(null);
+const currentPosts = ref({
+    data: [],
+    next: null
+});
+
+watch(() => props.posts, () => {
+    if (props.posts) {
+        currentPosts.value = {
+            data: props.posts.data,
+            next: props.posts.links?.next
+        }
+    }
+}, {deep: true, immediate: true})
 
 onMounted(() => {
     const observer = new IntersectionObserver(
-        entries => entries.forEach(entry => entry.isIntersecting && loadMore()), {
+        (entries) => entries.forEach(entry => entry.isIntersecting && loadMore()), {
             rootMargin: "-250px 0px 0px 0px"
         }
     );
@@ -36,14 +50,14 @@ onMounted(() => {
 
 
 function loadMore() {
-    if (!props.posts.links.next) {
+    if (!currentPosts.value.next) {
         return;
     }
 
-    axiosClient.get(props.posts.links.next)
+    axiosClient.get(currentPosts.value.next)
         .then(({ data }) => {
-            props.posts.data = [...props.posts.data, ...data.data];
-            props.posts.links.next = data.links.next;
+            currentPosts.value.data = [...currentPosts.value.data, ...data.data];
+            currentPosts.value.next = data.links.next;
         });
 }
 
@@ -63,7 +77,7 @@ function openAttachmentPreviewModal(post, index) {
 function onEditModalHide() {
     editPost.value = {
         id: null,
-        body: '',
+        body: "",
         user: authUser,
     };
 }
@@ -73,7 +87,7 @@ function onEditModalHide() {
 <template>
     <div class="overflow-auto">
         <PostItem
-            v-for="post in posts.data"
+            v-for="post in currentPosts.data"
             :key="post.id"
             :post="post"
             @editClick="openEditModal"
@@ -92,7 +106,3 @@ function onEditModalHide() {
         />
     </div>
 </template>
-
-<style scoped>
-
-</style>
