@@ -31,7 +31,7 @@ const editAllowed = computed(() => {
 const deleteAllowed = computed(() => {
     if (user.value.id === authUser.id) return true;
     if (props.post.user.id === authUser.id) return true;
-    return !props.comment && props.post.group.role === "admin";
+    return !props.comment && props.post.group?.role === "admin";
 });
 </script>
 
