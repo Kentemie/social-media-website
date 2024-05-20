@@ -150,6 +150,17 @@ function update() {
     })
 }
 
+function deleteUser(user) {
+    if (!window.confirm(`Are you sure you want to remove user "${user.name}" from this group?`)) {
+        return false;
+    }
+    const form = useForm({
+        user_id: user.id,
+    });
+    form.delete(route("group.removeUser", props.group.slug), {
+        preserveScroll: true,
+    });
+}
 </script>
 
 <template>
@@ -266,7 +277,7 @@ function update() {
                     </TabList>
                     <TabPanels class="mt-2">
                         <TabPanel>
-                            <template v-if="page.props.posts.length !== 0">
+                            <template v-if="page.props.posts">
                                 <CreatePost :group="group" />
                                 <PostList class="flex-1" />
                             </template>
@@ -284,9 +295,10 @@ function update() {
                                     :user="user"
                                     :key="user.id"
                                     :show-role-dropdown="isCurrentUserAdmin"
-                                    :disable-role-dropdown="group.user_id === user.id"
+                                    :disable="group.user_id === user.id"
                                     class="shadow rounded-lg"
                                     @role-change="onRoleChange"
+                                    @delete="deleteUser"
                                 />
                             </div>
                         </TabPanel>

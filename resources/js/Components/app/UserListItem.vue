@@ -14,7 +14,7 @@ defineProps({
         type: Boolean,
         default: false,
     },
-    disableRoleDropdown: {
+    disable: {
         type: Boolean,
         default: false,
     }
@@ -22,7 +22,8 @@ defineProps({
 defineEmits([
     "approve",
     "reject",
-    "roleChange"
+    "roleChange",
+    "delete",
 ]);
 </script>
 
@@ -51,12 +52,19 @@ defineEmits([
                 <div v-if="showRoleDropdown">
                     <select
                         @change="$emit('roleChange', user.id, $event.target.value)"
-                        :disabled="disableRoleDropdown"
+                        :disabled="disable"
                         class="rounded-md border-0 py-1 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 max-w-xs text-sm leading-6"
                     >
                         <option :selected="user.role === 'admin'">admin</option>
                         <option :selected="user.role === 'user'">user</option>
                     </select>
+                    <button
+                        class="text-xs text-white py-1.5 px-2 rounded bg-gray-700 hover:bg-gray-800 ml-3 disabled:bg-gray-500"
+                        :disabled="disable"
+                        @click="$emit('delete', user)"
+                    >
+                        delete
+                    </button>
                 </div>
             </div>
         </div>

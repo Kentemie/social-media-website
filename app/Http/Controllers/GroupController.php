@@ -20,6 +20,7 @@ use App\Notifications\InvitationToGroup;
 use App\Notifications\RequestApproved;
 use App\Notifications\RequestToJoinGroup;
 use App\Notifications\RoleChanged;
+use App\Notifications\UserRemovedFromGroup;
 use Carbon\Carbon;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -30,7 +31,6 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 use Inertia\Inertia;
-use Inertia\Response;
 
 class GroupController extends Controller
 {
@@ -123,9 +123,7 @@ class GroupController extends Controller
      */
     public function updateImage(Request $request, Group $group)
     {
-        if (!$group->isAdmin(Auth::id())) {
-            return response('You do not have permission to perform this action.', 403);
-        }
+        $this->ensureAdmin($group);
 
         $data = $request->validate([
             'cover' => ['nullable', 'image'],
@@ -255,9 +253,7 @@ class GroupController extends Controller
      */
     public function processRequest(Request $request, Group $group)
     {
-        if (!$group->isAdmin(Auth::id())) {
-            return response('You do not have permission to perform this action.', 403);
-        }
+        $this->ensureAdmin($group);
 
         $data = $request->validate([
             'user_id' => ['required'],
@@ -288,13 +284,40 @@ class GroupController extends Controller
     }
 
     /**
+     * Remove a user from a group
+     */
+    public function removeUser(Request $request, Group $group)
+    {
+        $this->ensureAdmin($group);
+
+        $data = $request->validate([
+            'user_id' => ['required'],
+        ]);
+
+        $userId = $data['user_id'];
+
+        if ($group->isOwner($userId)) {
+            return response("The owner of the group cannot be removed.", 403);
+        }
+
+        $groupUser = GroupUser::where('user_id', $userId)
+            ->where('group_id', $group->id)
+            ->first();
+
+        if ($groupUser) {
+            $groupUser->delete();
+            $groupUser->user->notify(new UserRemovedFromGroup($group));
+        }
+
+        return back();
+    }
+
+    /**
      * Change the role of the resulting user
      */
     public function changeRole(Request $request, Group $group)
     {
-        if (!$group->isAdmin(Auth::id())) {
-            return response('You do not have permission to perform this action.', 403);
-        }
+        $this->ensureAdmin($group);
 
         $data = $request->validate([
             'user_id' => ['required'],
@@ -318,4 +341,12 @@ class GroupController extends Controller
 
         return back();
     }
+
+    private function ensureAdmin(Group $group)
+    {
+        if (!$group->isAdmin(Auth::id())) {
+            abort(403, 'You do not have permission to perform this action.');
+        }
+    }
+
 }
