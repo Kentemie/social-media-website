@@ -9,6 +9,14 @@ import PostModal from "@/Components/app/PostModal.vue";
 const authUser = usePage().props.auth.user;
 
 
+defineProps({
+    group: {
+        type: Object,
+        default: null,
+    }
+});
+
+
 const showModal = ref(false);
 const newPost = ref({
     id: 0,
@@ -31,7 +39,7 @@ function showCreatePostModal() {
         >
             Click here to create a new post
         </div>
-        <PostModal :post="newPost" v-model="showModal" />
+        <PostModal :post="newPost" :group="group" v-model="showModal" />
     </div>
 </template>
 

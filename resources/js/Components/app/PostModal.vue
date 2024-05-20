@@ -37,6 +37,10 @@ const props = defineProps({
         type: Object,
         required: true,
     },
+    group: {
+        type: Object,
+        default: null,
+    },
     modelValue: {
         type: Boolean,
         default: false,
@@ -83,6 +87,7 @@ const form = useForm({
     body: "",
     attachments: [],
     deleted_attachment_ids: [],
+    group_id: null,
     _method: "POST",
 });
 
@@ -139,6 +144,9 @@ function processErrors(errors) {
 }
 
 function submit() {
+    if (props.group) {
+        form.group_id = props.group.id;
+    }
     form.attachments = attachmentFiles.value.map(myFile => myFile.file);
     if (props.post.id) {
         form._method = "PUT";
@@ -210,6 +218,11 @@ function submit() {
                                 </DialogTitle>
                                 <div class="p-4">
                                     <PostUserHeader :post="post" :show-time="false" class="mb-4" />
+
+                                    <div v-if="formErrors.group_id" class="bg-red-500 py-2 px-3 rounded text-white mb-3">
+                                        {{ formErrors.group_id }}
+                                    </div>
+
                                     <ckeditor :editor="editor" v-model="form.body" :config="editorConfig"></ckeditor>
                                     <div
                                         v-if="showExtensionsText"

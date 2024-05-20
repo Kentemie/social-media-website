@@ -10,9 +10,6 @@ import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
 
 
 defineProps({
-    posts: {
-        type: Object,
-    },
     groups: {
         type: Array,
     }
@@ -33,7 +30,7 @@ defineProps({
             </div>
             <div class="lg:col-span-6 lg:order-2 h-full overflow-hidden flex flex-col">
                 <CreatePost />
-                <PostList :posts="posts" class="flex-1" />
+                <PostList class="flex-1" />
             </div>
         </div>
     </AuthenticatedLayout>

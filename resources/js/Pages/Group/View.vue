@@ -13,23 +13,25 @@ import InviteUserModal from "@/Pages/Group/Partials/InviteUserModal.vue";
 import UserListItem from "@/Components/app/UserListItem.vue";
 import TextInput from "@/Components/TextInput.vue";
 import GroupForm from "@/Components/app/GroupForm.vue";
+import CreatePost from "@/Components/app/CreatePost.vue";
+import PostList from "@/Components/app/PostList.vue";
 
 
-const authUser = usePage().props.auth.user;
+const page = usePage();
 
 
 const props = defineProps({
+    success: {
+        type: String,
+    },
     group: {
         type: Object,
-    },
-    requests: {
-        type: Array,
     },
     users: {
         type: Array,
     },
-    success: {
-        type: String,
+    requests: {
+        type: Array,
     },
     errors: {
         type: Object,
@@ -227,16 +229,16 @@ function update() {
                         </div>
                         <div class="flex flex-1 justify-between items-center p-4">
                             <h2 class="font-bold text-lg">{{ group.name }}</h2>
-                            <PrimaryButton v-if="!authUser" :href="route('login')">
+                            <PrimaryButton v-if="!page.props.auth.user" :href="route('login')">
                                 Login to join
                             </PrimaryButton>
                             <PrimaryButton v-if="isCurrentUserAdmin" @click="showInviteUserModal = true">
                                 Invite users
                             </PrimaryButton>
-                            <PrimaryButton v-if="authUser && !group.role && group.auto_approval" @click="joinToGroup">
+                            <PrimaryButton v-if="page.props.auth.user && !group.role && group.auto_approval" @click="joinToGroup">
                                 Join the group
                             </PrimaryButton>
-                            <PrimaryButton v-if="authUser && !group.role && !group.auto_approval" @click="joinToGroup">
+                            <PrimaryButton v-if="page.props.auth.user && !group.role && !group.auto_approval" @click="joinToGroup">
                                 Request to join
                             </PrimaryButton>
                         </div>
@@ -263,8 +265,14 @@ function update() {
                         </Tab>
                     </TabList>
                     <TabPanels class="mt-2">
-                        <TabPanel class="bg-white p-3 shadow">
-                            Posts
+                        <TabPanel>
+                            <template v-if="page.props.posts.length !== 0">
+                                <CreatePost :group="group" />
+                                <PostList class="flex-1" />
+                            </template>
+                            <div v-else class="py-8 text-center">
+                                You are not allowed to view posts of this group
+                            </div>
                         </TabPanel>
                         <TabPanel v-if="isInGroup">
                             <div class="mb-3">

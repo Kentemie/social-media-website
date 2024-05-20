@@ -10,14 +10,7 @@ import PostModal from "@/Components/app/PostModal.vue";
 import PostAttachmentPreviewModal from "@/Components/app/PostAttachmentPreviewModal.vue";
 
 
-const authUser = usePage().props.auth.user;
-
-
-const props = defineProps({
-    posts: {
-        type: Object,
-    },
-});
+const page = usePage();
 
 
 const showEditModal = ref(false);
@@ -30,11 +23,11 @@ const currentPosts = ref({
     next: null
 });
 
-watch(() => props.posts, () => {
-    if (props.posts) {
+watch(() => page.props.posts, () => {
+    if (page.props.posts) {
         currentPosts.value = {
-            data: props.posts.data,
-            next: props.posts.links?.next
+            data: page.props.posts.data,
+            next: page.props.posts.links?.next
         }
     }
 }, {deep: true, immediate: true})
@@ -78,7 +71,7 @@ function onEditModalHide() {
     editPost.value = {
         id: null,
         body: "",
-        user: authUser,
+        user: page.props.auth.user,
     };
 }
 
@@ -93,7 +86,7 @@ function onEditModalHide() {
             @editClick="openEditModal"
             @attachmentClick="openAttachmentPreviewModal"
         />
-        <div ref="loadMoreIntersect" />
+        <div ref="loadMoreIntersect" class="p-0.5"></div>
         <PostModal
             :post="editPost"
             v-model="showEditModal"

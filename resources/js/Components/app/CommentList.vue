@@ -3,6 +3,7 @@
 import { ChatBubbleLeftEllipsisIcon, HandThumbUpIcon } from "@heroicons/vue/24/outline/index.js";
 import { Disclosure, DisclosureButton, DisclosurePanel } from "@headlessui/vue";
 import { ref } from "vue";
+import { Link } from "@inertiajs/vue3";
 
 import axiosClient from "@/axiosClient.js";
 
@@ -25,8 +26,8 @@ const props = defineProps({
     }
 });
 const emit = defineEmits([
-    'commentCreate',
-    'commentDelete',
+    "commentCreate",
+    "commentDelete",
 ]);
 
 
@@ -42,7 +43,7 @@ function createComment() {
                 props.parentComment.number_of_comments++;
             }
             props.post.number_of_comments++;
-            emit('commentCreate');
+            emit("commentCreate");
         });
 }
 
@@ -64,7 +65,7 @@ function deleteComment(commentId) {
                     props.parentComment.number_of_comments--;
                 }
                 props.post.number_of_comments--;
-                emit('commentDelete');
+                emit("commentDelete");
             });
     }
 }
@@ -96,14 +97,14 @@ function onCommentCreate() {
     if (props.parentComment) {
         props.parentComment.number_of_comments++;
     }
-    emit('commentCreate');
+    emit("commentCreate");
 }
 
 function onCommentDelete() {
     if (props.parentComment) {
         props.parentComment.number_of_comments--;
     }
-    emit('commentDelete');
+    emit("commentDelete");
 }
 
 </script>
@@ -131,18 +132,18 @@ function onCommentDelete() {
         >
             <div class="flex gap-2 justify-between">
                 <div class="flex gap-2">
-                    <a href="javascript:void(0)">
+                    <Link :href="route('profile', comment.user.username)">
                         <img
                             :src="comment.user.avatar_url"
                             alt="Some avatar"
-                            class="w-[40px] h-[40px] rounded-full border border-2 transition-all hover:border-blue-500"
+                            class="w-[40px] rounded-full border border-2 transition-all hover:border-blue-500"
                         />
-                    </a>
+                    </Link>
                     <div>
                         <h4 class="font-bold">
-                            <a href="javascript:void(0)" class="hover:underline">
+                            <Link :href="route('profile', comment.user.username)" class="hover:underline">
                                 {{ comment.user.name }}
-                            </a>
+                            </Link>
                         </h4>
                         <small class="text-xs text-gray-400">{{ comment.updated_at }}</small>
                     </div>

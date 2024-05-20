@@ -65,6 +65,15 @@ class Group extends Model
         return $this->user_id === $userId;
     }
 
+    public function isMember($userId): bool
+    {
+        return GroupUser::query()
+            ->where('user_id', '=', $userId)
+            ->where('group_id', '=', $this->id)
+            ->where('status', '=', GroupUserStatus::APPROVED->value)
+            ->exists();
+    }
+
     public function getSlugOptions() : SlugOptions
     {
         return SlugOptions::create()

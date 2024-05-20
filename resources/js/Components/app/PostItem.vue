@@ -54,7 +54,7 @@ function sendPostReaction() {
             <PostUserHeader :post="post" />
             <EditDeleteDropdown :user="post.user" @edit="openPostEditModal" @delete="deletePost" />
         </div>
-        <div class="mb-2">
+        <div class="mb-3">
             <ReadMoreReadLess :content="post.body" :short-content="post.short_body" />
         </div>
         <div v-if="post.attachments.length !== 0" class="grid gap-3 mb-3" :class="[
