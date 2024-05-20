@@ -52,7 +52,7 @@ function sendPostReaction() {
     <div class="bg-white border rounded p-4 shadow mb-3">
         <div class="flex items-center justify-between">
             <PostUserHeader :post="post" />
-            <EditDeleteDropdown :user="post.user" @edit="openPostEditModal" @delete="deletePost" />
+            <EditDeleteDropdown :post="post" @edit="openPostEditModal" @delete="deletePost" />
         </div>
         <div class="mb-3">
             <ReadMoreReadLess :content="post.body" :short-content="post.short_body" />

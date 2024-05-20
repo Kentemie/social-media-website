@@ -13,6 +13,8 @@ use App\Models\PostAttachment;
 use App\Models\PostComment;
 use App\Models\Reaction;
 use App\Models\User;
+use App\Notifications\CommentDeleted;
+use App\Notifications\PostDeleted;
 use Illuminate\Http\Request;
 use Illuminate\Contracts\Routing\ResponseFactory;
 use Illuminate\Foundation\Application;
@@ -62,6 +64,7 @@ class PostController extends Controller
     /**
      * Update the specified resource in storage.
      */
+
     public function update(UpdatePostRequest $request, Post $post): RedirectResponse
     {
         $data = $request->validated();
@@ -104,14 +107,19 @@ class PostController extends Controller
      */
     public function destroy(Post $post): Application|Response|RedirectResponse|ContractApplication|ResponseFactory
     {
-        $id = Auth::id();
+        $userId = Auth::id();
 
-        if ($post->user_id !== $id) {
-            return response("You are not allowed to delete this post", 403);
+        if ($post->isOwner($userId) || $post->group && $post->group->isAdmin($userId)) {
+            $post->delete();
+
+            if (!$post->isOwner($userId)) {
+                $post->user->notify(new PostDeleted());
+            }
+
+            return back();
         }
 
-        $post->delete();
-        return back();
+        return response("You are not allowed to delete this post", 403);
     }
 
     /**
@@ -186,12 +194,20 @@ class PostController extends Controller
      */
     public function deleteComment(PostComment $comment): Application|Response|ContractApplication|ResponseFactory
     {
-        if ($comment->user->id !== Auth::id()) {
-            return response("You are not allowed to delete this comment", 403);
+        $userId = Auth::id();
+        $post = $comment->post;
+
+        if ($comment->isOwner($userId) || $post->isOwner($userId)) {
+            $comment->delete();
+
+            if (!$comment->isOwner($userId)) {
+                $comment->user->notify(new CommentDeleted($comment, $post));
+            }
+
+            return response(null, 204);
         }
 
-        $comment->delete();
-        return response(null, 204);
+        return response("You are not allowed to delete this comment", 403);
     }
 
 

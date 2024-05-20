@@ -148,7 +148,12 @@ function onCommentDelete() {
                         <small class="text-xs text-gray-400">{{ comment.updated_at }}</small>
                     </div>
                 </div>
-                <EditDeleteDropdown :user="comment.user" @edit="editComment(comment)" @delete="deleteComment(comment.id)" />
+                <EditDeleteDropdown
+                    :comment="comment"
+                    :post="post"
+                    @edit="editComment(comment)"
+                    @delete="deleteComment(comment.id)"
+                />
             </div>
             <div class="pl-12">
                 <div v-if="editingComment && editingComment.id === comment.id">
